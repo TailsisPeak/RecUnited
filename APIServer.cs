@@ -108,7 +108,7 @@ namespace server
             try
 			{
 				//2 different servers for 3 different stages of the game, the apis change so much idk anymore
-				this.listener.Prefixes.Add("http://0.0.0.0:" + config.port + start.Program.version + "/"); // Changed to work with the server IP in the json. Why am I making it like this when this is the server side? Because I have no idea what I'm doing (:
+				this.listener.Prefixes.Add("http://0.0.0.0:" + "5058" + start.Program.version + "/"); // Changed to work with the server IP in the json. Why am I making it like this when this is the server side? Because I have no idea what I'm doing (:
                 this.listener.Start();
 
                 if (true)

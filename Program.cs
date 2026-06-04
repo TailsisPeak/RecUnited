@@ -77,7 +77,7 @@ namespace start
             }
             
             Console.WriteLine("//Custom Room Downloader has been moved to the settings tab!" + Environment.NewLine);
-            Console.WriteLine("(1) What's New" + Environment.NewLine +"(2) Change Settings" + Environment.NewLine + "(3) Modify Profile" + Environment.NewLine + "(4) Build Download Links" + Environment.NewLine + "(5) Start Server");
+            Console.WriteLine("(1) What's New" + Environment.NewLine +"(2) Change Settings" + Environment.NewLine + "(3) Modify Profile" + Environment.NewLine + "(4) Build Download Links" + Environment.NewLine + "(5) Start Server" + Environment.NewLine + "(6) Credits");
             string readline = Console.ReadLine();
             if (readline == "1")
             {
@@ -339,24 +339,35 @@ namespace start
             {
                 Console.Title = "RecUnited Download";
                 Console.WriteLine("Debug Message! This may be none fuctional due to me fucking nuking 99% of the code here");
-                
-                
-                
-                    
-                    
-                        Console.Title = "RecUnited";
-                        version = "2018";
-                        Console.Clear();
-                        
-                        new NameServer();
-                        new ImageServer();
-                        new APIServer();
-                        new WebSocket();
-                    
-                   
-                    
-                
+
+
+
+
+
+                Console.Title = "RecUnited";
+                version = "2018";
+                Console.Clear();
+
+                new NameServer();
+                new ImageServer();
+                new APIServer();
+                new WebSocket();
+
+
+
+
                 Console.WriteLine(msg);
+            }
+            if (readline == "6")
+            {
+                Console.Clear();
+                Console.WriteLine("This project could not be possible without the following contributors!");
+                Console.WriteLine(new WebClient().DownloadString("https://raw.githubusercontent.com/TailsisPeak/RecUnited/refs/heads/master/Contrib/credits.txt"));
+                Console.WriteLine(Environment.NewLine);
+                Console.WriteLine("Press any key to go back to main menu");
+                Console.ReadKey();
+                Console.Clear();
+                goto Start;
             }
         }
         public static string msg = "//This is the server sending and recieving data from recroom." + Environment.NewLine + "//Ignore this if you don't know what this means." + Environment.NewLine + "//Please start up the build now.";
