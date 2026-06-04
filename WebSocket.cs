@@ -33,9 +33,11 @@ namespace ws
 				if (flag)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("You are banned. Using this version of OpenRec will not work, please download OpenRec 0.4.2 or prior.");
+					Console.WriteLine("You have been banned from this Rec United Server. Please refrain from behavior that results in this for the future.");
 					Console.ForegroundColor = ConsoleColor.Green;
 					Program.bannedflag = true;
+					Console.WriteLine("Terminating.");
+					Environment.Exit(403);
 				}
 			}
 		}

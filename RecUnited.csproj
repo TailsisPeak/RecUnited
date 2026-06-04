@@ -29,11 +29,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="C:\Users\Tucker\Downloads\icon2.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
 </Project>
