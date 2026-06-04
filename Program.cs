@@ -67,7 +67,7 @@ namespace start
             Console.Title = "RecUnited Startup Menu";
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("RecUnited - Open source Old RecRoom server software. (Version: " + appversion + ")");
-            Console.WriteLine("Made and provided by Tailsispeak & {PlaceholderContributorName}.");
+            Console.WriteLine("Made and provided by The RecUnited Team.");
             Console.WriteLine("Just change that to however you want to be credited.");
             Console.WriteLine("Download source code here: https://github.com/TailsisPeak/RecUnited");
             Console.WriteLine("Discord: https://discord.gg/ukdJsRJZ2A" + Environment.NewLine);
