@@ -1,0 +1,6 @@
+{
+  "port": 7777,
+  "ServerIP": "localhost",
+  "maxPlayers": 100,
+  "debug": true // placeholder for now 
+}

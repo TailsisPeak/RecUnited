@@ -14,8 +14,24 @@ namespace server
 {
 	internal class APIServer
 	{
+
+        class Config
+        {
+            public int port { get; set; }
+			public int maxPlayers { get; set; }
+
+			public string ServerIP { get; set; }
+			public bool debug { get; set; }
+		}
+
+		private Config config;
+
 		public APIServer()
 		{
+
+			string json = File.ReadAllText("Conf\\config.json");
+			Config config = JsonConvert.DeserializeObject<Config>(json);
+
 			try
 			{
 				Console.WriteLine("[APIServer.cs] has started.");
@@ -26,21 +42,87 @@ namespace server
 				Console.WriteLine("An Exception Occurred while Listening :" + ex.ToString());
 			}
 		}
+
+		private void HandleRequest(HttpListenerContext context)
+{
+    HttpListenerRequest request = context.Request;
+    HttpListenerResponse response = context.Response;
+
+    try
+    {
+        string rawUrl = request.RawUrl;
+        string Url = "";
+        string text = "";
+
+        if (rawUrl.StartsWith("/api/"))
+        {
+            Url = rawUrl.Remove(0, 5);
+        }
+
+        using (StreamReader streamReader = new StreamReader(request.InputStream, request.ContentEncoding))
+        {
+            text = streamReader.ReadToEnd();
+        }
+
+        Console.WriteLine("API Requested: " + Url);
+        Console.WriteLine("API Data: " + text);
+
+        string s = "";
+
+        if (Url.StartsWith("versioncheck"))
+        {
+            s = VersionCheckResponse;
+        }
+        else if (Url == "players/v1/list")
+        {
+            s = BracketResponse;
+        }
+        else if (Url == "avatar/v2")
+        {
+            s = File.ReadAllText("SaveData\\avatar.txt");
+        }
+        else if (Url == "gameconfigs/v1/all")
+        {
+            s = File.ReadAllText("SaveData\\gameconfigs.txt");
+        }
+        else
+        {
+            s = BracketResponse;
+        }
+
+        byte[] bytes = Encoding.UTF8.GetBytes(s);
+        response.ContentLength64 = bytes.Length;
+        response.OutputStream.Write(bytes, 0, bytes.Length);
+        response.OutputStream.Close();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("HandleRequest error: " + ex);
+        response.StatusCode = 500;
+        response.OutputStream.Close();
+    }
+}
 		private void StartListen()
 		{
-			try
+            
+            try
 			{
 				//2 different servers for 3 different stages of the game, the apis change so much idk anymore
-				this.listener.Prefixes.Add("http://localhost:" + start.Program.version + "/");
-				
-				if (true)
+				this.listener.Prefixes.Add("http://0.0.0.0:" + config.port + start.Program.version + "/"); // Changed to work with the server IP in the json. Why am I making it like this when this is the server side? Because I have no idea what I'm doing (:
+                this.listener.Start();
+
+                if (true)
 				{
 					for (; ; )
 					{
-						this.listener.Start();
+						
 						Console.WriteLine("[APIServer.cs] is listening.");
-						HttpListenerContext context = this.listener.GetContext();
-						HttpListenerRequest request = context.Request;
+                        var context = this.listener.GetContext();
+                        ThreadPool.QueueUserWorkItem(_ =>
+                        {
+                            HandleRequest(context);
+                        });
+                        HttpListenerRequest request = context.Request;
 						HttpListenerResponse response = context.Response;
 						List<byte> list = new List<byte>();
 						string rawUrl = request.RawUrl;
@@ -91,7 +173,7 @@ namespace server
 							if (new WebClient().DownloadString("https://raw.githubusercontent.com/recroom2016/OpenRec/master/Update/banned.txt").Contains(File.ReadAllText("SaveData\\Profile\\userid.txt")))
 							{
 								Console.ForegroundColor = ConsoleColor.Red;
-								Console.WriteLine("You are banned. Using this version of OpenRec will not work, please download OpenRec 0.4.2 or prior.");
+								Console.WriteLine("You are banned from this Rec United Server.");
 								Console.ForegroundColor = ConsoleColor.Green;
 								start.Program.bannedflag = true;
 							}
