@@ -27,7 +27,7 @@ namespace api
 					},
 					new Activities.Charades.word
 					{
-						EN_US = "grape",
+						EN_US = "grape", 
 						Difficulty = 0
 					},
 					new Activities.Charades.word
