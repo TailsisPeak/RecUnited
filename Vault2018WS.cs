@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -15,42 +15,43 @@ namespace vaultgamesesh
 	{
 		public Late2018WebSock()
 		{
+			string wsUrl = $"ws://{server.ServerConfig.ServerIP}:{server.ServerConfig.WebSocketPort}/";
 			Late2018WebSock.instance = this;
+			this.WebSock = new WebSocketServer(wsUrl);
 			this.WebSock.AddWebSocketService<Late2018WebSock.NotificationWS>("/api/notification/v2");
 			this.WebSock.AddWebSocketService<Late2018WebSock.HubWS>("/hub/v1");
 			this.WebSock.Start();
-			Console.WriteLine("[LateWebSocket.cs] has started.");
-			Console.WriteLine("[LateWebSocket.cs] is listening.");
+			
+			Console.ForegroundColor = ConsoleColor.Green;
+			Console.WriteLine($"[Late2018WebSocket] Listening on {wsUrl}");
+			Console.ResetColor();
 		}
 
 		public void Broadcast(Notification.Reponse res)
 		{
-			Console.WriteLine(string.Concat(new string[]
+			try
 			{
-				"Broadcasting ",
-				JsonConvert.SerializeObject(res),
-				" to ",
-				this.WebSock.WebSocketServices["/api/notification/v2"].Sessions.Count.ToString(),
-				" clients."
-			}));
-
-			WebSock.WebSocketServices["/api/notification/v2"].Sessions.Broadcast(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)));
+				int clientCount = this.WebSock.WebSocketServices["/api/notification/v2"].Sessions.Count;
+				Console.WriteLine($"[Late2018WebSocket] Broadcasting to {clientCount} clients.");
+				WebSock.WebSocketServices["/api/notification/v2"].Sessions.Broadcast(
+					Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)));
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"[Late2018WebSocket] Broadcast error: {ex.Message}");
+			}
 		}
 
 		public static Late2018WebSock instance;
-
-		public WebSocketServer WebSock = new WebSocketServer("ws://localhost:20161/");
+		public WebSocketServer WebSock;
 
 		public class HubWS : WebSocketBehavior
 		{
 			protected override void OnMessage(MessageEventArgs e)
 			{
-				Console.WriteLine("LateWebSocket.cs Hub Requested.");
+				if (server.ServerConfig.Debug)
+					Console.WriteLine("[Late2018WS] Hub Requested.");
 				base.Send(JsonConvert.SerializeObject(new Late2018WebSock.Hub()));
-			}
-
-			public HubWS()
-			{
 			}
 		}
 
@@ -58,39 +59,33 @@ namespace vaultgamesesh
 		{
 			public Hub()
 			{
-				this.accessToken = "AccessDeezNuts";
+				this.accessToken = "RecUnitedRevivalToken";
 				this.SupportedTransports = new List<string>();
 				this.negotiateVersion = 0;
-				this.url = new Uri(string.Format("http://localhost:{0}/", "2018"));
+				this.url = new Uri($"http://{server.ServerConfig.PublicIP}:{server.ServerConfig.APIPort}/");
 			}
 
 			public Uri url { get; set; }
-
 			public string accessToken { get; set; }
-
 			public List<string> SupportedTransports { get; set; }
-
 			public int negotiateVersion { get; set; }
 		}
 
 		public class NotificationWS : WebSocketBehavior
 		{
+			protected override void OnOpen()
+			{
+				Console.ForegroundColor = ConsoleColor.Cyan;
+				Console.WriteLine($"[Late2018WS] Client connected from {Context.UserEndPoint}");
+				Console.ResetColor();
+			}
+
 			protected override void OnMessage(MessageEventArgs p0)
 			{
-				bool flag = new WebClient().DownloadString("https://raw.githubusercontent.com/recroom2016/OpenRec/master/Update/banned.txt").Contains(File.ReadAllText("SaveData\\Profile\\userid.txt"));
-				if (flag)
-				{
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("You are banned. Using this version of OpenRec will not work, please download OpenRec 0.4.2 or prior.");
-					Console.ForegroundColor = ConsoleColor.Green;
-					Program.bannedflag = true;
-					Late2018WebSock.instance.Broadcast(Notification.Reponse.createBannedResponse());
-				}
-				Console.WriteLine("LateWebSocket.cs Notif Requested.");
-				bool flag2 = p0.Data == null;
-				bool flag3 = flag2;
-				bool flag4 = flag3;
-				if (flag4)
+				if (server.ServerConfig.Debug)
+					Console.WriteLine("[Late2018WS] Notification Requested.");
+
+				if (p0.Data == null)
 				{
 					base.Send(string.Empty);
 				}
@@ -100,8 +95,16 @@ namespace vaultgamesesh
 				}
 			}
 
-			public NotificationWS()
+			protected override void OnClose(CloseEventArgs e)
 			{
+				Console.ForegroundColor = ConsoleColor.Yellow;
+				Console.WriteLine($"[Late2018WS] Client disconnected.");
+				Console.ResetColor();
+			}
+
+			protected override void OnError(WebSocketSharp.ErrorEventArgs e)
+			{
+				Console.WriteLine($"[Late2018WS] Error: {e.Message}");
 			}
 		}
 	}

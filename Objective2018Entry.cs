@@ -12,7 +12,7 @@ namespace api2018
 
 		// Token: 0x17000068 RID: 104
 		// (get) Token: 0x06000125 RID: 293 RVA: 0x0000287D File Offset: 0x00000A7D
-		// (set) Token: 0x06000126 RID: 294 RVA: 0x00002885 File Offset: 0x00000A85
+		// (set) Token: 0x06000126 RID: 294 RVA: 0x00002885 File Offset: 0x00000A85 
 		public int Group { get; set; }
 
 		// Token: 0x17000069 RID: 105
